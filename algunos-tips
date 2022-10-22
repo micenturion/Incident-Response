@@ -1,0 +1,264 @@
+Investigate Suspicious Linux Logins
+-aureport
+-less /var/log/secure | grep "authentication"
+-grep -R "authentication" /var/log/* |  less
+-grep "user NOT in sudoers" | less
+-ausearch -k lastlog-file
+-last -aiF
+-less /var/log/cron | egrep 'FAIL|ERROR'
+-journalctl _SYSTEMD_UNIT=sshd.service | grep error
+-lastb -adF
+-aureport -x --summary
+aureport --failed
+-autotrace /bin/date
+-aureport -f -i --summary
+-grep -R "Failed password" /var/log/*
+ grep -aR (cuando el archivo tiene formato binario)
+
+-----------------------------------------------------------------------------------------------
+
+grep -aRc "cmd" /var/www/html/* --exclude=*{png,jpg,jpeg,css,bmp,pdf} > allcmd.txt
+
+grep -aRc "cmd" /var/www/html/* --exclude=*{png,jpg,jpeg,css,bmp,pdf,xls,xlsx,doc,docx} > allcmd1.txt
+
+grep -aRc "cmd" /var/www/html/* --exclude=*{png,PNG,jpg,jpeg,css,bmp,pdf,PDF,xls,XLS,XLSX,xlsx,doc,docx,csv,JPG,wav,gif,ttf,woff2,json,icc,mo,xml,svg,eot,woff} > allcmd9.txt
+
+grep -aRcl "cmd" /var/www/html/* --exclude=*{png,PNG,jpg,jpeg,css,bmp,pdf,PDF,xls,XLS,XLSX,xlsx,doc,docx,csv,JPG,wav,gif,ttf,woff2,json,icc,mo,xml,svg,eot,woff,less} | xargs stat
+
+cat /var/log/apache2/access.log | awk -F\" ' { print $1,$2 } ' | grep "file"
+
+grep -RPn "(passthru|exec|eval|shell_exec|assert|str_rot13|system|phpinfo|base64_decode|chmod|mkdir|fopen|fclose|readfile) *\("
+
+------------------------------------------------------------------------------------
+BUSCAR POR EXPRESIONES REGULARES
+
+grep -rl 'if(\@copy(\$\_FILES' /var/www/html/
+
+-----------------------------------------------------------------------------------------------
+
+Buscar dentro de archivos .GZ
+
+zgrep "filename.php" $(find . /var/log/ -name "*.gz")
+
+-------------------------------------------------------------------------------------------------
+
+CentOS cuando se instalo un paquete en especial
+grep -i installed /var/log/yum.log | grep "paquete"
+
+see a list of all files that have been edited in the last 15 days:
+ find ./ -type f -mtime -15
+
+-----------------------------------------
+VER LOS PROCESOS COMANDO TREE
+
+-------------------------------------------
+
+VER USUARIOS SOSPECHOSOS
+
+cat /etc/passwd
+
+------------------------------------------------------------
+
+GRUPOS SOSPECHOSOS
+
+Checking for suspicious group entries…
+
+ tail -n 4 /etc/group
+ 
+grep -E ‘mail|php’ /etc/group
+
+-------------------------------------------------------------
+
+REVISION DE ARCHIVOS
+
+Searching for files that had their metadata changed within the last 5 days…
+
+find / -ctime +1 -ctime -5
+
+Checking user .bash_history file for commands executed (+order of execution)...
+
+history
+
+--------------------------------------------
+
+listar tareas programadas de un usuario x
+
+crontab -u XXX -l
+
+--------------------------------------------------------------------
+REVISAR ULTIMOS LOGEOS DE USUARIOS
+
+last
+w
+lastlog
+sudo last -f /var/log/wtmp
+
+sudo last -f /var/log/btmp
+
+last -f wtmp.dump
+
+cat /var/log/auth.log
+
+-----------------------------------------------
+
+Hunt Actor’s IP Address...
+
+Searching through the error.logs file for our threat actor’s IP address “192.168.XX.XX”...
+
+---------------------------------------------------------------------------------
+
+Decoding Suspicious String...
+
+cat post-string.txt | base64 -d
+
+-------------------------------------------------------------
+
+BUSCAR POR TIEMPOS DE MODIFICACION
+
+# find / -newermt "2019-09-06 18:30:00" -not -newermt "2019-09-08 00:15:00" > quicktimeline.txt
+
+---------------------------------------------------------------
+
+# journalctl --output=short-full > journal.txt
+
+
+-----------------------------------------------------------------------
+
+sudo dpkg --list > installed-pkgs.txt
+
+sudo dpkg --listfiles apache2 > apache2-files.txt
+
+ls /proc
+
+----------------------------------------------------------------------
+
+The holy grail here is the access.log file. First thing’s first, let’s get a headcount of the total IP addresses which tried communicating with the server:
+
+cat access.log | awk '{print $1}' | sort | uniq -c | sort -nr
+
+---------------------------------------------------------------------
+
+In this dataset, the general outlier, 192.168.56.102, appears to be the most in touch with the server. Let’s grep the logs containing this IP address from the log file into a separate file to reduce the noise: (I’ve also separately analyzed logs from other IP addresses but they appear to be harmless. During an investigation, you might want to poke every bit of evidence for intelligible leads.)
+
+ grep "192.168.56.102" access.log >> 192-168-56-102-access_log.log
+
+Next, let’s check the user-agent field in these logs to see if we can get something useful:
+
+cat 192-168-56-102-access_log.log | awk -F\" {print $6} | sort | uniq -c | sort -nr
+
+------------------------------------------------------
+
+Get-ADuser -Filter *
+
+Get-ADUser -Filter * >> accounts.txt
+
+Get-Service >> Services.txt
+
+Get-Process >> Processes.txt
+
+Get-ScheduledTask >> ScheduledTasks.txt
+
+Get-AdGroupMember "Domain Admins" >> DomainAdmins.txt
+
+invoke-command {net localgroup administrators} >> LocalAdministrators.txt
+
+invoke-command {netstat -nab} >> OpenConnections.txt
+
+invoke-command {ipconfig /displaydns} >> displaydns.txt
+
+
+---------------------------------------------------
+
+https://www.forensicfocus.com/articles/a-linux-forensics-starter-case-study/
+
+
+----
+
+dividir archivos de logs muy grandes
+
+sudo split -b 200M /mnt/c/Users/Liquid/Documents/logs/all-logs/var/log/httpd/ssl_request_log
+
+-----------------------------------
+AUDITORIA de VULNERABILIDADES
+SQLMAP
+sqlmap -u https://www.aduana.gov.py/anticipadas/dig_datos/getfile.php?id_r=2377  --random-agent --tamper=space2comment --level=5 --forms
+
+sqlmap -u https://aduana.gov.py/recaudacion_public/cua_com1.php  --random-agent --tamper=space2comment --level=5
+
+sqlmap -u https://aduana.gov.py/cms-items-edit.php?idItem=4450  --random-agent --tamper=space2comment
+
+
+WAPITI
+
+-----------------------------------------
+
+You can check this by running free online web scanners like Virus Total, Sucuri, Hosted Scan Security, Upguard, Observatory.
+
+
+----------------------------------------------
+
+WINDOWS IR
+echo > c:\ ir_file.txt
+
+set >> c:\ir_file.txt
+
+tasklist >> c:\ir_file.txt
+
+netstat -nao >> C:\ir_file.txt
+
+ipconfig /all >> c:\ir_file.txt
+
+cd C:\Program Files\SysinternalsSuite\   psloglist.exe -s -x security > C:\ir_securitylogs.txt
+
+wevtutil qe Security /q:"*[System/EventID=4616]" > c:\ ir_timechange.txt
+
+Get-Process | Out-File c:\ ir_processes.txt
+
+Get-EventLog Security | ?{$_.EventID -eq 4688} | Out-File C:\ ir_processcreated.txt
+---------------------------------------------------------------------------
+
+grep <patron> <archivo> | grep -vi "\.png \|\.jpg \|\.jpeg \|\.css \|\.bmp \|\.pdf \|\.xls \|\.xlsx \|\.doc \|\.docx \|\.csv \|\.wav \|\.gif \|\.ttf \|\.woff2 \|\.json \|\.icc \|\.mo \|\.xml \|\.svg \|\.eot \|\.woff \|\.less "
+
+---------------------------------------------------------------------------
+
+SACAR EL HASH DE UN ARHIVO EN WINDOWS
+
+certUtil -hashfile C:\file.img SHA256
+
+---------------------------------------------------------------------------------
+
+BUSCAR POR HASH - BASH
+
+1. Generar el hash del archivo que desea buscar
+sha256sum archivo.xx
+
+2. sha256sum --check checksum
+xxxhashxxxx sha256sum --check checksum
+
+3. buscar por el hash con el programa find
+find / -type f -exec sha1sum {} \; | grep "aqui va el hash del paso 1"
+
+
+------------------------------------------------------------------------------------------------
+ZIMBRA
+-----------------------------------------------------------------------------------------------
+zmmailbox -z -m account@domain.com search -l 100 "in:Inbox"
+Ver correos de una carpeta
+
+zmmetadump -m account@domain.com -i 26747
+Ver detalle de un correo
+
+zmmailbox -z -m account@domain.com search -t message "in:INBOX (before: 28/07/12)"
+Buscar correos anteriores a una fecha:
+
+grep 'from=<user@domain.com' /var/log/zimbra.log
+Listar todos los envíos realizados por un usuario
+
+grep 'user@domain.com> -> .*user2@domain2.com' /var/log/zimbra.log
+Buscar envío de usuario a otra cuenta
+
+grep sasl_username /var/log/zimbra.log
+Ver problemas de autentificación credenciales
+
+grep "authentication failed for" /opt/zimbra/log/audit.log
+Ver problemas de cuentas y password
