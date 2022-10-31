@@ -18,6 +18,14 @@ aureport --failed
 
 -----------------------------------------------------------------------------------------------
 
+grep
+     grep -v
+			Remove a single string.
+			grep -v 'red' file
+     egrep -v
+			Remove multiple strings.
+			egrep -v '(red|white|blue)' file
+
 grep -aRc "cmd" /var/www/html/* --exclude=*{png,jpg,jpeg,css,bmp,pdf} > allcmd.txt
 
 grep -aRc "cmd" /var/www/html/* --exclude=*{png,jpg,jpeg,css,bmp,pdf,xls,xlsx,doc,docx} > allcmd1.txt
@@ -31,6 +39,13 @@ cat /var/log/apache2/access.log | awk -F\" ' { print $1,$2 } ' | grep "file"
 grep -RPn "(passthru|exec|eval|shell_exec|assert|str_rot13|system|phpinfo|base64_decode|chmod|mkdir|fopen|fclose|readfile) *\("
 
 ------------------------------------------------------------------------------------
+sed
+     sed 's/FOO/BAR/g' file Replace FOO with BAR.
+     sed 's/FOO//g' file Replace FOO with nothing.
+     sed '/^FOO/d' file Remove lines that start with FOO.
+
+------------------------------------------------------------------------------------------
+
 BUSCAR POR EXPRESIONES REGULARES
 
 grep -rl 'if(\@copy(\$\_FILES' /var/www/html/
