@@ -51,6 +51,9 @@ BUSCAR POR EXPRESIONES REGULARES
 grep -rl 'if(\@copy(\$\_FILES' /var/www/html/
 
 -----------------------------------------------------------------------------------------------
+TODOS los crontab de todos los usuarios *se debe correr como root*
+# for user in $(cut -f1 -d: /etc/passwd); do echo $user; crontab -u $user -l; done
+-----------------------------------------------------------------------------------------------
 
 Buscar dentro de archivos .GZ
 
